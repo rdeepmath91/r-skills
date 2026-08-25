@@ -1,0 +1,28 @@
+{
+  "docs": {
+    "architecture": {
+      "doc_id": "<google-doc-id>",
+      "source": "docs/architecture.md",
+      "landscape": [
+        ["Architecture Drivers And Requirement Mapping", "Review Scope And Maturity"],
+        ["Appendix A: Supporting Boundary Views And Flows", "Observability And Correlation Flow"]
+      ],
+      "page_break_before": ["Appendices"]
+    },
+    "requirements": {
+      "doc_id": "<google-doc-id>",
+      "source": "docs/requirements-and-use-cases.md",
+      "landscape": [
+        ["Visual At A Glance", "Canonical Contract Invariants"]
+      ],
+      "page_break_before": ["Success Criteria And KPIs", "Functional Requirements"]
+    }
+  },
+  "live_link_map": {
+    "requirements-and-use-cases.md": "https://docs.google.com/document/d/<id>/edit",
+    "architecture.md": "https://docs.google.com/document/d/<id>/edit"
+  },
+  "shared_doc_link_map": {
+    "https://docs.google.com/document/d/<old-shared-doc-id>/edit?tab=t.tabA": "https://docs.google.com/document/d/<new-doc-id>/edit?tab=t.tabA"
+  }
+}
