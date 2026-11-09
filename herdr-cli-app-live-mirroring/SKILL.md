@@ -1,7 +1,7 @@
 ---
 name: herdr-cli-app-live-mirroring
 description: "Use when mirroring Herdr CLI agents in the native app."
-version: 1.0.0
+version: 2.0.0
 author: Hermes Agent
 license: MIT
 metadata:
@@ -14,20 +14,26 @@ metadata:
 
 Expose existing terminal-Herdr agent panes as individual native-app tabs without restarting the agents, copying their conversations, or starting a second writer.
 
-This is a compatibility workflow, not backend migration or automatic catalog synchronization. Terminal `herdr` owns the original agents; native `herdr-core` (`hc`) owns attachment viewers. Native app Agents-panel status is normally absent for these viewers.
+This is a compatibility workflow, not backend migration or a shared agent registry. Terminal `herdr` owns the original agents; native `herdr-core` (`hc`) owns attachment viewers. Direct attachment alone normally lacks native Agents-panel status. The optional tested status bridge and automatic watcher below add lifecycle reporting and discovery without starting replacement conversations.
 
 ## When to Use
 
-Use when a user asks to expose existing terminal-Herdr tabs or agents in the native Herdr app, make their machine names consistent, or reconcile an interrupted live-mirroring rollout. Do not use to promise a unified backend, independent native lifecycle reporting, or automatic synchronization of future tabs.
+Use when a user asks to expose existing terminal-Herdr panes in the native app, keep future tabs discoverable, forward agent status, make machine names consistent, or reconcile an interrupted rollout. Choose manual attachment for a bounded one-off operation; use the optional watcher only with explicit automation authorization. Never promise a unified backend or detection independent of the legacy source.
 
 ## Preconditions and scope
 
-- Obtain authorization for the machines and tabs to expose. Creating spaces/tabs changes the visible native app selection.
+- Obtain authorization for the machines and tabs to expose. Manual `space.new`/`tab.new` can change selection; the optional watcher uses verified background label adoption instead. Persistent startup registration requires authorization too.
 - Keep the original client, source panes, and servers intact. Never stop agents to populate a sidebar.
 - Load `herdr-control` if available. Read each installed binary's help/skill; names and APIs differ between the terminal TUI and native app.
 - Before legacy pane/agent control, follow the installed `herdr --skill` caller-context rules. Check `HERDR_ENV`; do not fabricate context or act on another client's focused pane.
 - Discover actual executable paths. Native Windows installs may expose `herdr-core.exe`, not an `hc` alias. WSL tools can invoke Windows executables through `/mnt/c/...`.
 - Read the native app's generated `AGENTS.md` before changing its layout. Typical locations: `~/.config/herdr-app/AGENTS.md` and the Windows user's equivalent. Do not edit generated guides or application-owned layout documents.
+
+## Read-only audit or interrupted rollout
+
+For a request to inspect, simulate from a fresh context, or reconstruct existing mappings, do not install, register, rename, create views, focus tabs, send input, or change settings. Start with the existing catalogs and live metadata. Use [read-only discovery and mapping](references/read-only-reconstruction.md) to discover missing executable aliases and reconstruct exact source/destination bindings without historical manifests.
+
+A metadata-only audit can verify process and pane bindings without reading screens. It does not satisfy conversation-screen, input-delivery, or full setup acceptance. Keep recognized agents, ordinary/unclassified panes, live native views and status-reporting views as separate counts. Do not recreate an unmatched source view without authorization; a view may have been intentionally closed.
 
 ## 1. Distinguish and inventory both runtimes
 
@@ -53,7 +59,7 @@ For the verified source machine/session, collect:
 
 These bracketed portions denote optional arguments, not literal shell syntax. `--machine` and `--session` cannot be combined in the legacy CLI; a saved machine already selects its remote session.
 
-Save each batch to a private, durable manifest outside disposable scratch directories. Record source machine/profile ID, session, workspace/tab labels, pane ID, agent kind/name, cwd, conversation reference when available, and destination identifiers/readback. Count/deduplicate with code; inventory is time-sensitive. Distinguish agent panes from ordinary shells, and do not read credential/setup panes without checking their purpose.
+For a production rollout, save each batch to a private, durable manifest outside disposable scratch directories (directory mode 0700, files 0600). For a read-only audit, an explicitly scoped private scratch report is sufficient; do not publish it with the reusable skill. Record source machine/profile ID, session, workspace/tab labels, pane ID, agent kind/name, cwd, conversation reference when available, and destination identifiers/readback. Count/deduplicate with code; inventory is time-sensitive. Distinguish agent panes from ordinary shells, and do not read credential/setup panes without checking their purpose.
 
 One manifest row per source pane; retain original spelling. Preserve the source names unless the user requests changes. A tab's title may describe old work, not its current agent type.
 
@@ -106,7 +112,7 @@ The native app may wrap remote argv in a login-shell launcher; root `sh` is not 
 For every attachment:
 
 1. `hc get RETURNED_TERMINAL`: terminal is live; foreground argv identifies the intended legacy session/pane attachment.
-2. `hc read RETURNED_TERMINAL --lines 0`: an actual source conversation screen appears, not a shell prompt, startup error, or ownership refusal. Keep output bounded and private. Do not send a task or submit draft input merely to test attachment.
+2. For authorized nonsensitive panes, `hc read RETURNED_TERMINAL --lines 0`: an actual source conversation screen appears, not a shell prompt, startup error, or ownership refusal. This returns the complete viewport; `--lines 0` is not a secrecy safeguard. Skip screens and screenshots for credential/setup panes or metadata-only audits, and report that visual acceptance is untested. Keep output bounded and private. Do not send a task or submit draft input merely to test attachment.
 3. Read source `agent list/get` again: original source pane still exists. Compare conversation identity where available. No replacement agent should have been launched.
 4. `herdr-app ls`: intended machine/space/tab contains the exact destination terminal.
 5. `herdr-app shot CHOSEN_PATH`: inspect the image before claiming visual verification. The app can return the last frame from a different selected space; a screenshot file alone does not prove the intended tab is shown.
@@ -139,15 +145,23 @@ Keep the existing outer tab containing the nested TUI as fallback. Do not close 
 ## 7. Limits, recovery, and report
 
 - Same screen and input target: yes, verified by binding the viewer to the existing pane. Avoid simultaneous typing from two clients.
-- Shared native agent registry: no. Legacy detection state does not automatically become OSC 7501 status in core.
-- New or closed source tabs automatically mirrored: no. Refresh the inventory and reconcile explicitly.
+- Shared native agent registry: no. The optional bridge translates legacy detection into OSC 7501; direct attachment alone does not.
+- Future source panes: automatic discovery only when the optional watcher is installed, running, unpaused, and both inventories are reachable. Manual mode requires explicit reconciliation.
+- Shell-only panes: waiting views, not shared shells and not fake agents. A waiting view discards typed commands, then attaches when Hermes or Codex is recognized.
+- Closed/dismissed views: do not blindly recreate them. The watcher preserves dismissal records; it does not deliberately close user tabs when a source disappears. A helper exiting may cause the native app itself to remove its finished tab.
 - True backend migration: no. Existing processes remain owned by terminal Herdr.
-- Reboot recovery, notification sounds, and automatic reattachment: not established by this workflow. Verify separately; core may recover a lost viewer into a shell rather than replaying the command.
+- A verified startup entry can relaunch the watcher at Windows sign-in. This does not restore killed AI processes, prove an actual reboot test, or establish notification sounds. Core may recover a lost viewer into a shell; automatic source-agent restoration remains out of scope.
 - Never resume a second agent against a live conversation as a workaround for missing sidebar status.
 - Stop only a viewer you created, after checking its exact argv/identity and supported lifecycle. Never use broad process kills or stop the source server. Verify original agents survive any viewer cleanup.
 - To add a custom status bridge, obtain scope, implement/test separately, and verify actual native status transitions. A bridge that merely forwards legacy API state inherits legacy detector errors. Do not deploy unfinished helpers or imply their existence means synchronization works.
 
 Final report: machine naming changes; verified live-view count by workspace; original-agent survival; remaining status/automation limits; durable manifest location. Do not claim full migration.
+
+## 8. Optional status bridge and automatic discovery
+
+For user-authorized ongoing mapping, follow [automatic watcher installation and acceptance](references/automatic-sync.md). The self-contained `scripts/` directory contains the actual bridge, safe shell waiter, watcher, and executable unit tests. Start from `templates/auto-sync-config.example.json`, substitute discovered absolute paths, and keep the real configuration/state private.
+
+Do not count a shell waiting view as an agent. After rollout, independently join the current source inventory, native attachment argv/labels, app tab membership, and actual reported status; the watcher's bookkeeping count is not sufficient evidence of sidebar coverage. Reconcile any changes during the audit. Keep screenshots, operational manifests, addresses, and conversation IDs outside this public skill.
 
 ## Upstream compatibility context
 

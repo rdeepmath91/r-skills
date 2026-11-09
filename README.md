@@ -10,7 +10,7 @@ This repository is not limited to Hermes. Skills use a `SKILL.md` entry point wi
 | --- | --- |
 | [google-docs](google-docs/SKILL.md) | Create, edit, format, and publish Google Docs. |
 | [google-forms](google-forms/SKILL.md) | Create and manage Google Forms through Google Apps Script. |
-| [herdr-cli-app-live-mirroring](herdr-cli-app-live-mirroring/SKILL.md) | Show existing Herdr CLI agent terminals as individual tabs in the native Herdr app, including remote machines and local WSL. |
+| [herdr-cli-app-live-mirroring](herdr-cli-app-live-mirroring/SKILL.md) | Preserve existing Herdr sessions while exposing remote/WSL views, forwarding Hermes/Codex sidebar status, and optionally discovering future CLI tabs automatically. |
 | [pr_summary](pr_summary/SKILL.md) | Generate weekly GitHub pull-request activity summaries. |
 | [weekly-report](weekly-report/SKILL.md) | Prepare weekly reports from work activity and reporting sources. |
 
@@ -31,7 +31,7 @@ Example request:
 
 The Herdr skill documents a live-attachment workaround. Terminal Herdr and the native app use different backends. The workflow opens views of existing agent terminals without restarting those agents or duplicating their conversations.
 
-It does **not** provide a unified backend, native Agents-panel lifecycle reporting, or automatic synchronization of newly created tabs. Read the verification and recovery sections before making changes.
+Optional, explicitly authorized helpers now add Hermes/Codex Agents-panel status and automatic discovery of future CLI panes. The skill includes the tested bridge, safe shell waiting view, deduplicating watcher, configuration template, and unit tests. Plain shells are not misrepresented as agents. This is still **not** a unified backend or automatic restoration of killed AI processes; source detection errors can propagate into reported status. Read the installation, verification, and recovery limits before enabling automation.
 
 ## Sharing and safety
 

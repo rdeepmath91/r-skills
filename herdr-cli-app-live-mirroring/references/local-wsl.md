@@ -6,7 +6,7 @@ Verify the actual WSL distribution, Linux user/cwd, legacy session and pane IDs.
 
 Find the actual legacy binary with `command -v herdr`. Read local `herdr agent list`, `workspace list`, and `tab list --workspace LIVE_ID`. Recheck current pane and session identity. Retain the original nested-TUI tab as fallback.
 
-Read `herdr-app commands` for the installed `space.new`/`tab.new` schema. Supply explicit machine `""` for a local space so another client's current remote selection cannot redirect creation.
+Read `herdr-app commands` for the installed `space.new`/`tab.new` schema. Supply explicit machine `""` to document that this is a local space. In the tested app, scripted `space.new` defaults to local; interactive keys and clicks follow the focused space's machine. Do not claim that scripts implicitly follow another client's remote selection; verify the installed command contract.
 
 ## Payload
 

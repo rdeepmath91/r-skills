@@ -1,0 +1,27 @@
+{
+  "app": "/mnt/c/Users/WINDOWS_USER/AppData/Local/Programs/herdr-app/herdr-app.exe",
+  "hc": "/mnt/c/Users/WINDOWS_USER/AppData/Local/Programs/herdr-core/herdr-core.exe",
+  "windowsCwd": "C:\\Users\\WINDOWS_USER",
+  "stateDir": "/home/WSL_USER/.local/share/herdr-native-status-bridge/auto-sync-state",
+  "interval": 5,
+  "timeout": 12,
+  "machines": [
+    {
+      "id": "local",
+      "nativeName": null,
+      "sourcePrefix": ["/home/WSL_USER/.local/bin/herdr", "--session", "default"],
+      "session": "default",
+      "home": "/home/WSL_USER",
+      "herdr": "/home/WSL_USER/.local/bin/herdr",
+      "distro": "Ubuntu"
+    },
+    {
+      "id": "remote-box",
+      "nativeName": "remote-box",
+      "sourcePrefix": ["/home/WSL_USER/.local/bin/herdr", "--machine", "remote-box"],
+      "session": "default",
+      "home": "/home/REMOTE_USER",
+      "herdr": "/home/REMOTE_USER/.local/bin/herdr"
+    }
+  ]
+}
