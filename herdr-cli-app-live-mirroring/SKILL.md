@@ -1,7 +1,7 @@
 ---
 name: herdr-cli-app-live-mirroring
 description: "Use when mirroring Herdr CLI agents in the native app."
-version: 2.0.0
+version: 2.0.1
 author: Hermes Agent
 license: MIT
 metadata:
@@ -29,11 +29,23 @@ Use when a user asks to expose existing terminal-Herdr panes in the native app, 
 - Discover actual executable paths. Native Windows installs may expose `herdr-core.exe`, not an `hc` alias. WSL tools can invoke Windows executables through `/mnt/c/...`.
 - Read the native app's generated `AGENTS.md` before changing its layout. Typical locations: `~/.config/herdr-app/AGENTS.md` and the Windows user's equivalent. Do not edit generated guides or application-owned layout documents.
 
+## Acceptance and reporting contract
+
+- Establish the exact live exercise for each requested machine before dispatch: which existing agent must create the source tab, which fresh agent kind it must start, and what the watcher must detect without manual reconciliation. A controller-created tab, or an agent-created shell followed by a controller-started AI, does not satisfy an actor-created-agent-tab test.
+- Report deployment, current one-to-one mappings, actor-driven end-to-end tests, activity-status accuracy, fresh-machine installation and reboot recovery separately. Mark each machine's requested exercise passed, blocked, waiting or untested; never turn a passing unit suite or one host's result into “all tested.”
+- Before cleaning up a test pane or viewer, recheck its current task and queued input. Preserve it if the user has begun real work there; a test label or original creation authority is not continuing permission to close it.
+
+## Naming domains: inspect the actual selected view
+
+For a reported rename mismatch, identify the exact terminal and its app space/tab from the screenshot and live app membership before comparing legacy CLI labels. A native-only terminal can have a descriptive OSC terminal `title` shown in the Agents row while its app tab is still unnamed and displayed as `1`; core `name`, terminal `title`, legacy tab `label`, app-tab `name`, and space `name` are separate fields. Confirm each relevant field with `hc get` and `herdr-app ls`. A correct terminal title does not prove an app-tab rename occurred.
+
+Do not treat this as a watcher failure when the terminal has no legacy attachment or `sync.key`: native-only tabs are deliberately outside the CLI watcher's naming scope. For a user-authorized app-tab rename, use explicit `herdr-app do tab.rename` IDs and preserve the requested spelling exactly. Read back the exact app tab and verify its terminal and live foreground process are unchanged. Never enable broad title-to-tab synchronization or mutate unrelated native-only tabs as a one-off fix. An inspection request alone is not authorization to choose and apply a new name.
+
 ## Read-only audit or interrupted rollout
 
 For a request to inspect, simulate from a fresh context, or reconstruct existing mappings, do not install, register, rename, create views, focus tabs, send input, or change settings. Start with the existing catalogs and live metadata. Use [read-only discovery and mapping](references/read-only-reconstruction.md) to discover missing executable aliases and reconstruct exact source/destination bindings without historical manifests.
 
-A metadata-only audit can verify process and pane bindings without reading screens. It does not satisfy conversation-screen, input-delivery, or full setup acceptance. Keep recognized agents, ordinary/unclassified panes, live native views and status-reporting views as separate counts. Do not recreate an unmatched source view without authorization; a view may have been intentionally closed.
+A metadata-only audit can verify process and pane bindings without reading screens. It does not satisfy conversation-screen, input-delivery, or full setup acceptance. Keep recognized agents, ordinary/unclassified panes, live native views and status-reporting views as separate counts. For a disputed mirrored status, join the exact source pane to `hc get` and app membership, inspect `herdr agent explain` and an authorized bounded source viewport, then resample both sides; a bridge can faithfully forward an incorrect source idle fallback. A screenshot shows only the current rendered sidebar region, not the entire inventory. Do not recreate an unmatched source view without authorization; a view may have been intentionally closed.
 
 ## 1. Distinguish and inventory both runtimes
 
@@ -152,7 +164,7 @@ Keep the existing outer tab containing the nested TUI as fallback. Do not close 
 - True backend migration: no. Existing processes remain owned by terminal Herdr.
 - A verified startup entry can relaunch the watcher at Windows sign-in. This does not restore killed AI processes, prove an actual reboot test, or establish notification sounds. Core may recover a lost viewer into a shell; automatic source-agent restoration remains out of scope.
 - Never resume a second agent against a live conversation as a workaround for missing sidebar status.
-- Stop only a viewer you created, after checking its exact argv/identity and supported lifecycle. Never use broad process kills or stop the source server. Verify original agents survive any viewer cleanup.
+- Stop only an authorized viewer after checking its exact argv/identity, supported lifecycle and current ownership. If a user has adopted a test view for real work, leave it open unless closure is freshly authorized. Never use broad process kills or stop the source server. Verify original agents survive any viewer cleanup.
 - To add a custom status bridge, obtain scope, implement/test separately, and verify actual native status transitions. A bridge that merely forwards legacy API state inherits legacy detector errors. Do not deploy unfinished helpers or imply their existence means synchronization works.
 
 Final report: machine naming changes; verified live-view count by workspace; original-agent survival; remaining status/automation limits; durable manifest location. Do not claim full migration.
